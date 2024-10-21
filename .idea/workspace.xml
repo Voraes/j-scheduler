@@ -4,9 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="d6a39fa0-55e2-4cad-8770-54500775645f" name="Changes" comment="">
+    <list default="true" id="d6a39fa0-55e2-4cad-8770-54500775645f" name="Changes" comment="Changing Settings">
+      <change afterPath="$PROJECT_DIR$/.github/workflows/gradle.yml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -116,11 +117,32 @@
       <workItem from="1728997207833" duration="4886000" />
       <workItem from="1729093528532" duration="38000" />
       <workItem from="1729093587893" duration="968000" />
-      <workItem from="1729521993347" duration="8458000" />
+      <workItem from="1729521993347" duration="9005000" />
     </task>
+    <task id="LOCAL-00001" summary="Changing Settings">
+      <option name="closed" value="true" />
+      <created>1729540860315</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1729540860315</updated>
+    </task>
+    <task id="LOCAL-00002" summary="Changing Settings">
+      <option name="closed" value="true" />
+      <created>1729540943580</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1729540943580</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="Changing Settings" />
+    <option name="LAST_COMMIT_MESSAGE" value="Changing Settings" />
   </component>
 </project>
