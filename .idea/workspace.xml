@@ -4,12 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="d6a39fa0-55e2-4cad-8770-54500775645f" name="Changes" comment="Changing Settings">
-      <change afterPath="$PROJECT_DIR$/.github/workflows/gradle.yml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-    </list>
+    <list default="true" id="d6a39fa0-55e2-4cad-8770-54500775645f" name="Changes" comment="Adding Github Actions" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -30,18 +25,18 @@
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
-  <component name="GitHubPullRequestSearchHistory"><![CDATA[{
-  "lastFilter": {
-    "state": "OPEN",
-    "assignee": "Voraes"
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;,
+    &quot;assignee&quot;: &quot;Voraes&quot;
   }
-}]]></component>
-  <component name="GithubPullRequestsUISettings"><![CDATA[{
-  "selectedUrlAndAccountId": {
-    "url": "https://github.com/Voraes/j-scheduler.git",
-    "accountId": "97d74e2f-4b1a-426b-a9f3-d4aac7c4736b"
+}</component>
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/Voraes/j-scheduler.git&quot;,
+    &quot;accountId&quot;: &quot;97d74e2f-4b1a-426b-a9f3-d4aac7c4736b&quot;
   }
-}]]></component>
+}</component>
   <component name="ProjectColorInfo">{
   &quot;customColor&quot;: &quot;&quot;,
   &quot;associatedIndex&quot;: 2
@@ -55,9 +50,9 @@
   "keyToString": {
     "Gradle.BackgroundTaskSchedulerTest.executor": "Run",
     "RunOnceActivity.ShowReadmeOnStart": "true",
-    "git-widget-placeholder": "master",
     "ignore.virus.scanning.warn.message": "true",
     "kotlin-language-version-configured": "true",
+    "last_opened_file_path": "C:/Users/victo/Documents/Idea-Projects/scheduler",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
@@ -117,7 +112,7 @@
       <workItem from="1728997207833" duration="4886000" />
       <workItem from="1729093528532" duration="38000" />
       <workItem from="1729093587893" duration="968000" />
-      <workItem from="1729521993347" duration="9005000" />
+      <workItem from="1729521993347" duration="9250000" />
     </task>
     <task id="LOCAL-00001" summary="Changing Settings">
       <option name="closed" value="true" />
@@ -135,7 +130,15 @@
       <option name="project" value="LOCAL" />
       <updated>1729540943580</updated>
     </task>
-    <option name="localTasksCounter" value="3" />
+    <task id="LOCAL-00003" summary="Adding Github Actions">
+      <option name="closed" value="true" />
+      <created>1729541505551</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1729541505551</updated>
+    </task>
+    <option name="localTasksCounter" value="4" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -143,6 +146,7 @@
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="Changing Settings" />
-    <option name="LAST_COMMIT_MESSAGE" value="Changing Settings" />
+    <MESSAGE value="Adding Github Actions" />
+    <option name="LAST_COMMIT_MESSAGE" value="Adding Github Actions" />
   </component>
 </project>
