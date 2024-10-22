@@ -4,7 +4,11 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="d6a39fa0-55e2-4cad-8770-54500775645f" name="Changes" comment="Editing GitHub Actions" />
+    <list default="true" id="d6a39fa0-55e2-4cad-8770-54500775645f" name="Changes" comment="Editing GitHub Actions">
+      <change beforePath="$PROJECT_DIR$/.github/workflows/gradle.yml" beforeDir="false" afterPath="$PROJECT_DIR$/.github/workflows/gradle.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/BackgroundTaskScheduler.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/BackgroundTaskScheduler.java" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -49,7 +53,9 @@
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
     "Gradle.BackgroundTaskSchedulerTest.executor": "Run",
+    "JUnit.BackgroundTaskSchedulerTest.executor": "Run",
     "JUnit.BackgroundTaskSchedulerTest.testAdjustTaskPriority.executor": "Run",
+    "JUnit.BackgroundTaskSchedulerTest.testTaskPrioritization.executor": "Run",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "git-widget-placeholder": "master",
     "ignore.virus.scanning.warn.message": "true",
@@ -63,7 +69,7 @@
     "vue.rearranger.settings.migration": "true"
   }
 }]]></component>
-  <component name="RunManager" selected="JUnit.BackgroundTaskSchedulerTest.testAdjustTaskPriority">
+  <component name="RunManager" selected="JUnit.BackgroundTaskSchedulerTest.testTaskPrioritization">
     <configuration name="BackgroundTaskSchedulerTest" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
       <ExternalSystemSettings>
         <option name="executionName" />
@@ -88,6 +94,15 @@
       <RunAsTest>true</RunAsTest>
       <method v="2" />
     </configuration>
+    <configuration name="BackgroundTaskSchedulerTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="j-scheduler.test" />
+      <option name="PACKAGE_NAME" value="" />
+      <option name="MAIN_CLASS_NAME" value="BackgroundTaskSchedulerTest" />
+      <option name="TEST_OBJECT" value="class" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
     <configuration name="BackgroundTaskSchedulerTest.testAdjustTaskPriority" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
       <module name="j-scheduler.test" />
       <option name="PACKAGE_NAME" value="" />
@@ -98,8 +113,20 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
+    <configuration name="BackgroundTaskSchedulerTest.testTaskPrioritization" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="j-scheduler.test" />
+      <option name="PACKAGE_NAME" value="" />
+      <option name="MAIN_CLASS_NAME" value="BackgroundTaskSchedulerTest" />
+      <option name="METHOD_NAME" value="testTaskPrioritization" />
+      <option name="TEST_OBJECT" value="method" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="JUnit.BackgroundTaskSchedulerTest.testTaskPrioritization" />
+        <item itemvalue="JUnit.BackgroundTaskSchedulerTest" />
         <item itemvalue="JUnit.BackgroundTaskSchedulerTest.testAdjustTaskPriority" />
         <item itemvalue="Gradle.BackgroundTaskSchedulerTest" />
       </list>
@@ -126,7 +153,7 @@
       <workItem from="1729093528532" duration="38000" />
       <workItem from="1729093587893" duration="968000" />
       <workItem from="1729521993347" duration="9250000" />
-      <workItem from="1729602691645" duration="1312000" />
+      <workItem from="1729602691645" duration="2664000" />
     </task>
     <task id="LOCAL-00001" summary="Changing Settings">
       <option name="closed" value="true" />
@@ -184,7 +211,15 @@
       <option name="project" value="LOCAL" />
       <updated>1729603725485</updated>
     </task>
-    <option name="localTasksCounter" value="8" />
+    <task id="LOCAL-00008" summary="Editing GitHub Actions">
+      <option name="closed" value="true" />
+      <created>1729604135241</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1729604135241</updated>
+    </task>
+    <option name="localTasksCounter" value="9" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">

@@ -31,21 +31,8 @@ public class BackgroundTaskScheduler {
     }
 
     public synchronized void adjustTaskPriority(Runnable task, int newPriority) {
-        PriorityTask foundTask = null;
-
-        // Synchronize
-        for (PriorityTask priorityTask : taskQueue) {
-            if (priorityTask.task == task) {
-                foundTask = priorityTask;
-                break;
-            }
-        }
-
-        if (foundTask != null) {
-            taskQueue.remove(foundTask);
-            foundTask.priority = newPriority;
-            taskQueue.add(foundTask);
-        }
+        taskQueue.removeIf(priorityTask -> priorityTask.task.equals(task));
+        taskQueue.add(new PriorityTask(task, newPriority));
     }
 
     public void shutdown() {
@@ -55,7 +42,7 @@ public class BackgroundTaskScheduler {
     // Task class with priority
     private static class PriorityTask implements Runnable, Comparable<PriorityTask> {
         private final Runnable task;
-        private int priority;
+        private final int priority;
 
         public PriorityTask(Runnable task, int priority) {
             this.task = task;
