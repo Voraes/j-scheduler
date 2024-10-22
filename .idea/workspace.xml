@@ -61,7 +61,7 @@
     &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
 }</component>
-  <component name="RunManager">
+  <component name="RunManager" selected="JUnit.BackgroundTaskSchedulerTest.testAdjustTaskPriority">
     <configuration name="BackgroundTaskSchedulerTest" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
       <ExternalSystemSettings>
         <option name="executionName" />
@@ -86,8 +86,19 @@
       <RunAsTest>true</RunAsTest>
       <method v="2" />
     </configuration>
+    <configuration name="BackgroundTaskSchedulerTest.testAdjustTaskPriority" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="j-scheduler.test" />
+      <option name="PACKAGE_NAME" value="" />
+      <option name="MAIN_CLASS_NAME" value="BackgroundTaskSchedulerTest" />
+      <option name="METHOD_NAME" value="testAdjustTaskPriority" />
+      <option name="TEST_OBJECT" value="method" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="JUnit.BackgroundTaskSchedulerTest.testAdjustTaskPriority" />
         <item itemvalue="Gradle.BackgroundTaskSchedulerTest" />
       </list>
     </recent_temporary>
