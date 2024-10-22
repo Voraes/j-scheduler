@@ -126,7 +126,7 @@
       <workItem from="1729093528532" duration="38000" />
       <workItem from="1729093587893" duration="968000" />
       <workItem from="1729521993347" duration="9250000" />
-      <workItem from="1729602691645" duration="594000" />
+      <workItem from="1729602691645" duration="1001000" />
     </task>
     <task id="LOCAL-00001" summary="Changing Settings">
       <option name="closed" value="true" />
@@ -168,7 +168,15 @@
       <option name="project" value="LOCAL" />
       <updated>1729603286235</updated>
     </task>
-    <option name="localTasksCounter" value="6" />
+    <task id="LOCAL-00006" summary="Editing GitHub Actions">
+      <option name="closed" value="true" />
+      <created>1729603585394</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1729603585394</updated>
+    </task>
+    <option name="localTasksCounter" value="7" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
