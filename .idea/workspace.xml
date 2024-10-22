@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="d6a39fa0-55e2-4cad-8770-54500775645f" name="Changes" comment="Adding Github Actions" />
+    <list default="true" id="d6a39fa0-55e2-4cad-8770-54500775645f" name="Changes" comment="Editing GitHub Actions" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -46,21 +46,23 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;Gradle.BackgroundTaskSchedulerTest.executor&quot;: &quot;Run&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
-    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;C:/Users/victo/Documents/Idea-Projects/scheduler&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "Gradle.BackgroundTaskSchedulerTest.executor": "Run",
+    "JUnit.BackgroundTaskSchedulerTest.testAdjustTaskPriority.executor": "Run",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "git-widget-placeholder": "master",
+    "ignore.virus.scanning.warn.message": "true",
+    "kotlin-language-version-configured": "true",
+    "last_opened_file_path": "C:/Users/victo/Documents/Idea-Projects/scheduler",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "vue.rearranger.settings.migration": "true"
   }
-}</component>
+}]]></component>
   <component name="RunManager" selected="JUnit.BackgroundTaskSchedulerTest.testAdjustTaskPriority">
     <configuration name="BackgroundTaskSchedulerTest" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
       <ExternalSystemSettings>
@@ -124,6 +126,7 @@
       <workItem from="1729093528532" duration="38000" />
       <workItem from="1729093587893" duration="968000" />
       <workItem from="1729521993347" duration="9250000" />
+      <workItem from="1729602691645" duration="594000" />
     </task>
     <task id="LOCAL-00001" summary="Changing Settings">
       <option name="closed" value="true" />
@@ -149,7 +152,23 @@
       <option name="project" value="LOCAL" />
       <updated>1729541505551</updated>
     </task>
-    <option name="localTasksCounter" value="4" />
+    <task id="LOCAL-00004" summary="Editing Github Actions">
+      <option name="closed" value="true" />
+      <created>1729602756245</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1729602756245</updated>
+    </task>
+    <task id="LOCAL-00005" summary="Editing GitHub Actions">
+      <option name="closed" value="true" />
+      <created>1729603286235</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1729603286235</updated>
+    </task>
+    <option name="localTasksCounter" value="6" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -158,6 +177,8 @@
   <component name="VcsManagerConfiguration">
     <MESSAGE value="Changing Settings" />
     <MESSAGE value="Adding Github Actions" />
-    <option name="LAST_COMMIT_MESSAGE" value="Adding Github Actions" />
+    <MESSAGE value="Editing Github Actions" />
+    <MESSAGE value="Editing GitHub Actions" />
+    <option name="LAST_COMMIT_MESSAGE" value="Editing GitHub Actions" />
   </component>
 </project>
