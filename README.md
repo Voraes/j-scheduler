@@ -1,7 +1,5 @@
 # J-Scheduler Documentation
 
----
-
 ## Table of Contents
 - [Introduction](#introduction)
 - [Features](#features)
@@ -17,12 +15,11 @@
 - [Contributing](#contributing)
 - [License](#license)
 
----
 
 ## Introduction
 J-Scheduler is a lightweight, Java-based library that allows developers to easily schedule background tasks with minimal setup. This framework offers configurable task prioritization, error handling, logging, and customizable scheduling options, all within a simple, intuitive API.
 
----
+
 
 ## Features
 - Zero-config out-of-the-box setup with default thread pool size.
@@ -32,7 +29,7 @@ J-Scheduler is a lightweight, Java-based library that allows developers to easil
 - Graceful shutdown for managing resources properly.
 - Lightweight and efficient, designed for easy integration into any project.
 
----
+
 
 ## Installation
 You can install the **Zero-config Background Task Framework** in 2 simple steps:
@@ -71,7 +68,7 @@ dependencies {
 </dependency>
 ```
 
----
+
 
 ## Quick Start
 ### Basic Setup
@@ -95,7 +92,7 @@ public class TaskDemo {
 ```
 This simple example schedules a one-time task with a 5-second delay. The task is executed based on priority.
 
----
+
 
 ## Usage
 ### Task Scheduling
@@ -136,7 +133,7 @@ scheduler.scheduleWithFixedDelay(() -> {
   - Delay: The delay between the end of the last execution and the start of the next.
   - Time unit: The unit of time for the delay and period (e.g. `TimeUnit.SECONDS`).
   - Priority: Task's priority. Higher priority tasks will be executed before lower priority ones, regardless of their delay.
----
+
 
 ## Task Prioritization
 Tasks are scheduled based on their priority. Higher priority tasks are executed before lower-priority tasks. 
@@ -151,7 +148,7 @@ System.out.println("Low priority task");
 }, 2, TimeUnit.SECONDS, 1);  // Lower priority
 ```
 
----
+
 
 ## Error Handling
 Error handling is built into the framework. If any task throws an exception, it will be logged, and the scheduler will continue running.
@@ -166,7 +163,7 @@ Task execution failed: Intentional error
 java.lang.RuntimeException: Intentional error
 ```
 
----
+
 
 ## Task Logging
 Each task execution is logged with its priority and execution status:
@@ -174,7 +171,7 @@ Each task execution is logged with its priority and execution status:
 - Success: "Task completed successfully!"
 - Failure: Detailed error logs.
 
----
+
 
 ## Shutdown
 You can gracefully shut down the scheduler to stop new tasks from being submitted and allow running tasks to complete.
@@ -187,7 +184,7 @@ You can too add a shutdown hook to the JVM to automatically shut down the schedu
 scheduler.registerShutdownHook();
 ```
 
----
+
 
 ## Examples
 
@@ -215,7 +212,7 @@ public class TaskDemo {
 }
 ```
 
----
+
 
 ## Contributing
 We welcome contributions to improve. If you have any ideas or encounter issues, feel free to open a pull request or issue in our GitHub repository.
@@ -223,7 +220,7 @@ We welcome contributions to improve. If you have any ideas or encounter issues, 
 2. Create a new branch for your feature or bugfix.
 3. Submit a pull request with a detailed description of the changes.
 
----
+
 
 ## License
 This project is licensed under the MIT License. See the [LICENSE](https://opensource.org/license/mit) for details.
