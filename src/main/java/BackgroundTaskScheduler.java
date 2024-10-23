@@ -1,3 +1,4 @@
+
 import java.util.concurrent.Executors;
 import java.util.concurrent.PriorityBlockingQueue;
 import java.util.concurrent.ScheduledExecutorService;
@@ -30,6 +31,43 @@ public class BackgroundTaskScheduler {
         }, delay, timeUnit);
     }
 
+    public void scheduleAtFixedRate(Runnable task, long initialDelay, long period, TimeUnit timeUnit, int priority) {
+        PriorityTask priorityTask = new PriorityTask(task, priority);
+        taskQueue.add(priorityTask);
+
+        executorService.scheduleAtFixedRate(() -> {
+            try {
+                PriorityTask taskToRun = taskQueue.poll(); // Remove from the queue the task with the highest priority
+                if (taskToRun != null) {
+                    System.out.println("Executing task with priority: " + taskToRun.priority);
+                    taskToRun.run();
+                }
+            } catch (Exception e) {
+                System.err.println("Task execution failed: " + e.getMessage());
+                e.printStackTrace();
+            }
+        }, initialDelay, period, timeUnit);
+    }
+
+    // Schedules a task to run with a fixed delay between executions
+    public void scheduleWithFixedDelay(Runnable task, long initialDelay, long delay, TimeUnit timeUnit, int priority) {
+        PriorityTask priorityTask = new PriorityTask(task, priority);
+        taskQueue.add(priorityTask);
+
+        executorService.scheduleWithFixedDelay(() -> {
+            try {
+                PriorityTask taskToRun = taskQueue.poll(); // Remove from the queue the task with the highest priority
+                if (taskToRun != null) {
+                    System.out.println("Executing task with priority: " + taskToRun.priority);
+                    taskToRun.run();
+                }
+            } catch (Exception e) {
+                System.err.println("Task execution failed: " + e.getMessage());
+                e.printStackTrace();
+            }
+        }, initialDelay, delay, timeUnit);
+    }
+
     public synchronized void adjustTaskPriority(Runnable task, int newPriority) {
         taskQueue.removeIf(priorityTask -> priorityTask.task.equals(task));
         taskQueue.add(new PriorityTask(task, newPriority));
@@ -37,6 +75,10 @@ public class BackgroundTaskScheduler {
 
     public void shutdown() {
         executorService.shutdown();
+    }
+
+    public void registerShutdownHook() {
+        Runtime.getRuntime().addShutdownHook(new Thread(this::shutdown));
     }
 
     // Task class with priority
