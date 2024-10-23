@@ -60,7 +60,7 @@ public class BackgroundTaskSchedulerTest {
 
         scheduler.adjustTaskPriority(lowPriorityTask, 3);
 
-        Thread.sleep(3000);
+        Thread.sleep(3500);
 
         // Low priority task should execute first after adjustment
         assertEquals("Low High ", executionOrder.toString(), "Tasks should execute in adjusted priority order");

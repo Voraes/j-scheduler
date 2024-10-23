@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="d6a39fa0-55e2-4cad-8770-54500775645f" name="Changes" comment="Adding New Methods and README file" />
+    <list default="true" id="d6a39fa0-55e2-4cad-8770-54500775645f" name="Changes" comment="Editing README" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -89,7 +89,7 @@
     "vue.rearranger.settings.migration": "true"
   }
 }]]></component>
-  <component name="RunManager" selected="JUnit.BackgroundTaskSchedulerTest.testAdjustTaskPriority">
+  <component name="RunManager" selected="Gradle.BackgroundTaskSchedulerTest">
     <configuration name="BackgroundTaskSchedulerTest" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
       <ExternalSystemSettings>
         <option name="executionName" />
@@ -104,6 +104,30 @@
             <option value=":test" />
             <option value="--tests" />
             <option value="&quot;BackgroundTaskSchedulerTest&quot;" />
+          </list>
+        </option>
+        <option name="vmOptions" />
+      </ExternalSystemSettings>
+      <ExternalSystemDebugServerProcess>false</ExternalSystemDebugServerProcess>
+      <ExternalSystemReattachDebugProcess>true</ExternalSystemReattachDebugProcess>
+      <DebugAllEnabled>false</DebugAllEnabled>
+      <RunAsTest>true</RunAsTest>
+      <method v="2" />
+    </configuration>
+    <configuration name="BackgroundTaskSchedulerTest.testAdjustTaskPriority" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
+      <ExternalSystemSettings>
+        <option name="executionName" />
+        <option name="externalProjectPath" value="$PROJECT_DIR$" />
+        <option name="externalSystemIdString" value="GRADLE" />
+        <option name="scriptParameters" value="" />
+        <option name="taskDescriptions">
+          <list />
+        </option>
+        <option name="taskNames">
+          <list>
+            <option value=":test" />
+            <option value="--tests" />
+            <option value="&quot;BackgroundTaskSchedulerTest.testAdjustTaskPriority&quot;" />
           </list>
         </option>
         <option name="vmOptions" />
@@ -145,10 +169,11 @@
     </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="Gradle.BackgroundTaskSchedulerTest" />
+        <item itemvalue="Gradle.BackgroundTaskSchedulerTest.testAdjustTaskPriority" />
         <item itemvalue="JUnit.BackgroundTaskSchedulerTest.testAdjustTaskPriority" />
         <item itemvalue="JUnit.BackgroundTaskSchedulerTest.testTaskPrioritization" />
         <item itemvalue="JUnit.BackgroundTaskSchedulerTest" />
-        <item itemvalue="Gradle.BackgroundTaskSchedulerTest" />
       </list>
     </recent_temporary>
   </component>
@@ -175,7 +200,7 @@
       <workItem from="1729521993347" duration="9250000" />
       <workItem from="1729602691645" duration="4097000" />
       <workItem from="1729610911227" duration="4606000" />
-      <workItem from="1729685088129" duration="8252000" />
+      <workItem from="1729685088129" duration="8655000" />
     </task>
     <task id="LOCAL-00001" summary="Changing Settings">
       <option name="closed" value="true" />
@@ -257,7 +282,15 @@
       <option name="project" value="LOCAL" />
       <updated>1729697197103</updated>
     </task>
-    <option name="localTasksCounter" value="11" />
+    <task id="LOCAL-00011" summary="Editing README">
+      <option name="closed" value="true" />
+      <created>1729697318223</created>
+      <option name="number" value="00011" />
+      <option name="presentableId" value="LOCAL-00011" />
+      <option name="project" value="LOCAL" />
+      <updated>1729697318223</updated>
+    </task>
+    <option name="localTasksCounter" value="12" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -270,6 +303,7 @@
     <MESSAGE value="Editing GitHub Actions" />
     <MESSAGE value="Improving Code" />
     <MESSAGE value="Adding New Methods and README file" />
-    <option name="LAST_COMMIT_MESSAGE" value="Adding New Methods and README file" />
+    <MESSAGE value="Editing README" />
+    <option name="LAST_COMMIT_MESSAGE" value="Editing README" />
   </component>
 </project>
