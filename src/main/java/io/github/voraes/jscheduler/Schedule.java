@@ -3,7 +3,12 @@ package io.github.voraes.jscheduler;
 import java.time.Duration;
 import java.util.Objects;
 
-/** Describes when and how often a job runs. */
+/**
+ * Immutable timing policy for a job.
+ *
+ * <p>Fixed rate follows planned cadence and may overlap. Fixed delay schedules its next occurrence
+ * only after the preceding occurrence, including retries, terminates.
+ */
 public sealed interface Schedule permits Schedule.Once, Schedule.FixedRate, Schedule.FixedDelay {
     Duration initialDelay();
 

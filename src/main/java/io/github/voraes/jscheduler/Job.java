@@ -4,7 +4,10 @@ import java.time.Duration;
 import java.util.Objects;
 import java.util.Optional;
 
-/** Immutable user work and its scheduling metadata. */
+/**
+ * Immutable user work and its resilience metadata. A job may be reused for multiple submissions;
+ * thread safety of the supplied {@link Runnable} remains the caller's responsibility.
+ */
 public final class Job {
     private final String name;
     private final Runnable task;
@@ -68,6 +71,7 @@ public final class Job {
         return Optional.ofNullable(circuitBreakerPolicy);
     }
 
+    /** Mutable job builder; it is not thread-safe. */
     public static final class Builder {
         private final String name;
         private Runnable task;

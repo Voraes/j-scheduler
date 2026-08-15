@@ -668,6 +668,19 @@ final class DefaultScheduler implements Scheduler {
     }
 
     @Override
+    public SchedulerSnapshot snapshot() {
+        lock.lock();
+        try {
+            SchedulerStatus status = infrastructureStopped ? SchedulerStatus.TERMINATED
+                    : accepting ? SchedulerStatus.RUNNING : SchedulerStatus.SHUTTING_DOWN;
+            return new SchedulerSnapshot(status, mode, concurrency, handles.size(), scheduled.size(),
+                    ready.size(), activeExecutions);
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    @Override
     public Thread registerShutdownHook() {
         Thread hook = Thread.ofPlatform().name("j-scheduler-shutdown-hook").unstarted(this::shutdown);
         Runtime.getRuntime().addShutdownHook(hook);

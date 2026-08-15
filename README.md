@@ -1,44 +1,39 @@
 # J-Scheduler
 
-Modern task scheduling for Java.
+Modern resilient task scheduling for Java.
 
-J-Scheduler is a lightweight embedded execution engine for Java 21 applications. It separates time
-eligibility from ready-work priority, offers bounded platform or virtual-thread execution, exposes
-thread-safe job handles, and defines cancellation and shutdown behavior explicitly.
+J-Scheduler is a lightweight embedded scheduling and execution engine for Java 21 applications.
+Schedule work, bound concurrency, retry failures, use virtual threads, and compose dependency
+workflows without operating a separate scheduling platform.
 
-> Version 2 is under active development. The core engine, resilient execution pipeline, and
-> lightweight workflow DAGs are available; Spring Boot integration is planned for a later phase.
+[![CI](https://github.com/Voraes/j-scheduler/actions/workflows/gradle.yml/badge.svg)](https://github.com/Voraes/j-scheduler/actions/workflows/gradle.yml)
+![Java 21+](https://img.shields.io/badge/Java-21%2B-007396)
+![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)
+
+> J-Scheduler 2 is under active development. Publishing metadata is prepared, but no Maven Central
+> release is claimed yet.
 
 ## Features
 
 - Immediate, delayed, fixed-rate, and fixed-delay scheduling
-- Priority ordering among ready jobs with deterministic FIFO tie-breaking
-- Bounded platform-thread pools
-- Virtual-thread-per-task execution with an explicit concurrency limit
-- Observable lifecycle states and immutable execution snapshots
-- Fixed-delay and exponential-backoff retries with filtering and jitter
-- Cooperative execution timeouts
-- Explicit recurring concurrency policies
-- Per-job and named token-bucket rate limits
-- Per-job circuit breakers
-- Structured, failure-isolated execution events
-- Validated dependency workflows with parallel branches and deterministic DOT export
-- Cancellation before, during, and between recurring executions
-- Immediate and graceful shutdown
-- Failure isolation for tasks and lifecycle listeners
-- Injectable `Clock` for deterministic lifecycle timestamps
-- Deprecated compatibility facade for the 1.x API
-
-## Requirements
-
-- Java 21 or newer
-- The included Gradle wrapper
+- Priority ordering among ready work with deterministic FIFO tie-breaking
+- Bounded platform-thread pools and bounded virtual-thread execution
+- Thread-safe handles, immutable execution snapshots, and explicit lifecycle states
+- Fixed and exponential retry with filtering, jitter, and non-blocking backoff
+- Cooperative timeouts and cancellation
+- Per-job recurring concurrency policies
+- Token-bucket rate limits and circuit breakers
+- Structured, failure-isolated lifecycle events
+- Validated workflow DAGs with parallel branches and failure policies
+- Spring Boot auto-configuration, declarative scheduling, Micrometer, and Actuator health
+- JMH benchmarks and dedicated concurrency stress tests
 
 ## Quick start
 
 ```java
-import io.github.voraes.jscheduler.Job;
 import io.github.voraes.jscheduler.ConcurrencyPolicy;
+import io.github.voraes.jscheduler.Job;
+import io.github.voraes.jscheduler.JobHandle;
 import io.github.voraes.jscheduler.RetryPolicy;
 import io.github.voraes.jscheduler.Schedule;
 import io.github.voraes.jscheduler.Scheduler;
@@ -50,7 +45,7 @@ try (Scheduler scheduler = Scheduler.builder()
         .maxConcurrentJobs(100)
         .build()) {
 
-    var handle = scheduler.schedule(
+    JobHandle handle = scheduler.schedule(
             Job.builder("sync-customers")
                     .task(this::syncCustomers)
                     .priority(10)
@@ -66,83 +61,66 @@ try (Scheduler scheduler = Scheduler.builder()
             Schedule.fixedDelay(Duration.ofMinutes(1)));
 
     System.out.println(handle.id());
-    System.out.println(handle.status());
 }
 ```
 
-## Architecture and ordering
+## Why J-Scheduler?
+
+`ScheduledExecutorService` is useful infrastructure, but applications often need consistent behavior
+around priority, retries, overlap, rate limits, cancellation, and dependency graphs. J-Scheduler puts
+those policies behind one small typed API while remaining an in-process library.
+
+It is deliberately not a distributed scheduler. It does not provide leader election, durable lambda
+persistence, cluster coordination, or database-backed execution. Use a distributed platform when
+work must survive process loss or coordinate across nodes.
+
+## Scheduling
 
 ```mermaid
 flowchart LR
-    A[Scheduled jobs] --> B[Future queue ordered by time]
-    B -->|become due| C[Ready queue ordered by priority]
-    C --> D{Execution mode}
-    D --> E[Bounded platform workers]
-    D --> F[Bounded virtual threads]
+    A["Scheduled jobs"] --> B["Delay queue<br/>ordered by eligibility"]
+    B -->|"due"| C["Ready queue<br/>priority + FIFO"]
+    C --> D["Resilience pipeline"]
+    D --> E{"Execution mode"}
+    E --> F["Bounded platform workers"]
+    E --> G["Bounded virtual threads"]
 ```
 
-Time eligibility always comes first. A high-priority job scheduled for the future cannot displace a
-lower-priority job that is already due. Once multiple jobs are ready, larger priority values execute
-first. Equal priorities are ordered by due time and then submission order. This ordering is
-deterministic at the ready-queue boundary; operating-system thread scheduling can naturally affect
-the observed start order when multiple workers are available. Strict priority can starve lower-priority
-work under a continuous higher-priority load; the scheduler deliberately provides no implicit priority
-aging.
-
-## Scheduling semantics
-
-### One-time work
+Time eligibility always comes first. Priority orders only jobs that are already due; a future
+high-priority job never displaces ready lower-priority work. Equal priorities are ordered by due time
+and submission order at the ready-queue boundary.
 
 ```java
-scheduler.execute(job); // immediate
+scheduler.execute(job);
 scheduler.schedule(job, Schedule.delayed(Duration.ofSeconds(5)));
+scheduler.schedule(job, Schedule.fixedRate(Duration.ofSeconds(10)));
+scheduler.schedule(job, Schedule.fixedDelay(Duration.ofSeconds(10)));
 ```
 
-### Fixed rate
+Fixed rate follows planned cadence, so occurrences can overlap when execution capacity allows. Fixed
+delay starts only after the previous occurrence, including its retries, has completed.
+
+## Virtual threads
 
 ```java
-scheduler.schedule(job,
-        Schedule.fixedRate(Duration.ofSeconds(1), Duration.ofSeconds(10)));
+Scheduler scheduler = Scheduler.builder()
+        .virtualThreads()
+        .maxConcurrentJobs(200)
+        .build();
 ```
 
-Fixed rate follows the planned cadence. If an execution lasts longer than its period, later
-occurrences become ready and may overlap when execution capacity is available. Missed cadence points
-are not silently discarded.
+Virtual threads reduce the cost of blocking threads; they do not make databases or remote services
+unbounded. J-Scheduler therefore requires an explicit concurrency limit and retains the permit while
+non-cooperative timed-out code is still running.
 
-### Fixed delay
-
-```java
-scheduler.schedule(job,
-        Schedule.fixedDelay(Duration.ofSeconds(1), Duration.ofSeconds(10)));
-```
-
-Fixed delay starts its delay only after the preceding execution completes. Occurrences of that job do
-not overlap.
-
-## Execution lifecycle
-
-Each occurrence follows a validated state machine:
-
-```text
-SCHEDULED -> READY -> RUNNING -> SUCCEEDED | FAILED | TIMED_OUT
-     |          |
-     +----------+-----------> CANCELLED
-                +-----------> SKIPPED
-```
-
-`JobHandle` safely exposes the aggregate job status, next planned execution, and latest immutable
-`JobExecution` snapshot. Recurring handles report `RUNNING` while any occurrence is active, `READY`
-when work is queued, and `SCHEDULED` when waiting for the next occurrence.
-
-Task exceptions are captured in `JobResult`; they never terminate scheduler coordination or worker
-infrastructure. Lifecycle listeners are similarly isolated. The core library does not print to
-standard output.
+Use `platformThreads(int)` for a bounded reusable worker pool. Both execution modes share the same
+scheduling, resilience, lifecycle, and workflow semantics.
 
 ## Retries
 
 ```java
 RetryPolicy retry = RetryPolicy.exponentialBackoff()
-        .maxAttempts(5) // includes the initial execution
+        .maxAttempts(5) // includes the initial attempt
         .initialDelay(Duration.ofMillis(250))
         .maxDelay(Duration.ofSeconds(30))
         .jitter(0.20)
@@ -150,15 +128,9 @@ RetryPolicy retry = RetryPolicy.exponentialBackoff()
         .build();
 ```
 
-Fixed-delay and exponential backoff are available. Jitter is proportional and bounded by
-`maxDelay`. A failed attempt is returned to the scheduler's timed queue, so backoff never occupies a
-worker or a global concurrency permit. Retry predicates run only after a task failure. Cancellation,
-shutdown, interruption, and timeout are not retried by default; timeout can be selected explicitly
-with `retryOn(JobTimeoutException.class)`.
-
-Retries belong to the same logical occurrence: `JobExecution.sequence()` stays constant while
-`attempt()` increases. A fixed-delay recurrence is scheduled only after all retries finish. Fixed-rate
-cadence remains independent, so distinct occurrences may coexist.
+Backoff returns work to the timed queue instead of occupying a worker or concurrency permit. Retries
+belong to the same logical occurrence: its sequence remains stable while its attempt increases.
+Cancellation, shutdown, interruption, and timeout are not retried by default.
 
 ## Timeouts
 
@@ -169,64 +141,22 @@ Job.builder("remote-call")
         .build();
 ```
 
-At the deadline J-Scheduler records `TIMED_OUT`, emits `JobTimedOut`, and requests interruption. Java
-cannot safely terminate arbitrary code. A task that ignores interruption continues occupying its
-execution permit until it returns; this prevents configured concurrency bounds from being silently
-violated.
+At the deadline J-Scheduler records `TIMED_OUT`, emits a timeout event, and requests interruption.
+Java cannot safely terminate arbitrary user code. A task that ignores interruption can continue until
+it returns, and it keeps its execution permit while doing so.
 
 ## Concurrency policies
 
-Recurring jobs can choose one policy:
+Recurring jobs choose how overlapping occurrences behave:
 
-- `ALLOW`: occurrences may overlap.
-- `SKIP_IF_RUNNING`: a due occurrence is skipped if another occurrence is running.
-- `QUEUE`: due occurrences wait and execute serially.
-- `REPLACE`: running occurrences receive an interruption/cancellation request before the new
-  occurrence begins. Non-cooperative code may briefly overlap with its replacement.
+| Policy | Behavior |
+| --- | --- |
+| `ALLOW` | Allow overlap when global execution capacity exists. |
+| `SKIP_IF_RUNNING` | Mark a due occurrence skipped while another is running. |
+| `QUEUE` | Keep due occurrences and execute them one at a time. |
+| `REPLACE` | Request interruption of running occurrences before the new one starts. |
 
-These policies apply per `JobHandle`, including retry attempts. They do not bypass the scheduler-wide
-platform/virtual-thread concurrency limit.
-
-## Rate limiting
-
-```java
-.rateLimit(RateLimit.perSecond(10))
-.rateLimit("payments-api", RateLimit.perSecond(10))
-```
-
-Rate limiting uses a monotonic token bucket. The first form creates a bucket for one scheduled job;
-the named form shares a bucket across jobs. All jobs using the same group must provide identical
-configuration. When no token is available, work is deferred through the timed queue instead of
-blocking a worker.
-
-## Circuit breaking
-
-```java
-.circuitBreaker(CircuitBreakerPolicy.builder()
-        .failureThreshold(5)
-        .openDuration(Duration.ofSeconds(30))
-        .halfOpenAttempts(1)
-        .build())
-```
-
-Each scheduled job owns a `CLOSED -> OPEN -> HALF_OPEN -> CLOSED` state machine. Consecutive failures
-open the circuit. Occurrences are skipped while it is open; after `openDuration`, a bounded number of
-half-open probes are admitted. A failed probe reopens the circuit and successful probes close it.
-The current state is available through `handle.circuitState()`.
-
-## Execution events
-
-```java
-Scheduler scheduler = Scheduler.builder()
-        .eventListener(event -> metrics.record(event))
-        .eventListener(event -> audit(event))
-        .build();
-```
-
-Structured events cover scheduling, start, success, failure, retry, skip, timeout, cancellation,
-rate-limit deferral, and circuit open/close transitions. An ordered daemon dispatcher isolates
-listener latency and reentrant scheduler calls from the engine; one listener exception does not
-prevent delivery to the others.
+`REPLACE` remains cooperative; code that ignores interruption may briefly overlap its replacement.
 
 ## Workflows
 
@@ -241,97 +171,143 @@ Workflow workflow = Workflow.builder("daily-report")
         .failurePolicy(WorkflowFailurePolicy.SKIP_DEPENDENTS)
         .build();
 
-WorkflowHandle handle = scheduler.schedule(workflow);
-WorkflowResult result = handle.completion()
-        .toCompletableFuture()
-        .join();
+WorkflowResult result = scheduler.schedule(workflow)
+        .completion().toCompletableFuture().join();
 ```
 
-Workflows are immutable directed acyclic graphs. Unknown dependencies and cycles are rejected before
-execution; cycle errors include the concrete path. Nodes become runnable only after all dependencies
-succeed, while independent ready nodes use the scheduler's normal concurrency and priority rules.
+```mermaid
+flowchart TD
+    A["Fetch orders"] --> C["Build report"]
+    B["Fetch customers"] --> C
+    C --> D["Send report"]
+```
 
-Each node is submitted through the ordinary job engine. Its retry, timeout, rate limit, circuit
-breaker, priority, events, and global platform/virtual-thread bound therefore behave exactly as they
-do outside a workflow.
+Graphs are immutable and validated for unknown nodes and cycles before execution. Independent nodes
+run in parallel. Every node uses the ordinary job engine, so retry, timeout, priority, rate limits,
+circuit breaking, events, and global concurrency bounds continue to apply.
 
-Failure policies are deliberately small:
+`FAIL_WORKFLOW` stops independent work after the first failure. `SKIP_DEPENDENTS` skips transitive
+dependents while allowing unrelated branches to finish.
 
-- `FAIL_WORKFLOW` interrupts active nodes and skips all pending nodes after the first failure.
-- `SKIP_DEPENDENTS` skips transitive dependents of a failure while independent branches finish.
+## Spring Boot
 
-`WorkflowResult` contains immutable per-node status and final `JobExecution` snapshots. Cancelling a
-workflow cancels active node handles and prevents pending nodes from starting. Interruption remains
-cooperative.
+The separate starter keeps Spring dependencies out of the core:
 
-For documentation and debugging, `workflow.toDot()` produces deterministic Graphviz DOT:
+```kotlin
+implementation("io.github.voraes:j-scheduler-spring-boot-starter:2.0.0-SNAPSHOT")
+implementation("org.springframework.boot:spring-boot-starter-actuator") // optional
+```
 
-```dot
-digraph "daily-report" {
-  "orders";
-  "customers";
-  "report";
-  "send";
-  "orders" -> "report";
-  "customers" -> "report";
-  "report" -> "send";
+```yaml
+j-scheduler:
+  execution:
+    mode: virtual
+    max-concurrent-jobs: 200
+  shutdown:
+    timeout: 30s
+```
+
+The starter provides a `Scheduler` bean, backs off for an application-defined scheduler, and performs
+bounded graceful shutdown. Simple recurring methods can use declarative scheduling:
+
+```java
+@ScheduledJob(name = "invoice-sync", initialDelay = "5s", fixedDelay = "30s", priority = 10)
+public void syncInvoices() {
+    // application work
 }
 ```
 
-## Cancellation
+Methods must be non-static, take no arguments, and return `void`; invalid signatures fail startup.
+Resilience remains in the programmatic `Job` API instead of turning the annotation into a second
+configuration language.
 
-```java
-handle.cancel();      // remove future/ready occurrences; let running work finish
-handle.cancel(true);  // also request interruption of running work
-```
+See the runnable [`spring-boot-example`](examples/spring-boot-example).
 
-Cancellation prevents every future recurrence. Interruption is cooperative: Java cannot safely force
-arbitrary user code to terminate, so running tasks must respond to interruption themselves.
+## Observability
 
-## Shutdown
+Core applications can attach ordered, failure-isolated `JobEventListener` instances. Events cover
+scheduling, start, completion, retry, skip, timeout, cancellation, rate-limit deferral, and circuit
+transitions, providing a vendor-neutral tracing hook.
 
-`shutdown()` rejects new work, cancels future and ready work, requests interruption of running work,
-and stops scheduler infrastructure.
+With Micrometer, the starter publishes:
 
-`shutdownGracefully(timeout)` rejects new work and cancels work that is not yet due, including future
-recurrences. Work that is already ready or running is allowed to finish until the timeout. If the
-timeout expires, remaining ready work is cancelled and running work is interrupted. It returns
-`true` only when work completed within the timeout.
+- `j.scheduler.jobs.scheduled`, `running`, `completed`, `failed`, `retried`, and `skipped`
+- `j.scheduler.job.duration`
+- `j.scheduler.queue.size`
 
-`close()` performs a graceful shutdown with a 30-second timeout. A JVM shutdown hook is available only
-through the explicit `registerShutdownHook()` opt-in.
+Meters contain no arbitrary job-name or job-ID tags. Actuator health reports aggregate scheduler
+status, execution mode, concurrency, and queue counts without exposing task payloads.
 
-## Building
+Named rate-limit groups retain token history for the scheduler lifetime so sequential submissions
+share one continuous limit. Treat group names as bounded configuration keys, not request identifiers.
+
+## Benchmarks
+
+The standalone JMH suite covers submission and priority contention, 100/10,000-task batches,
+platform and virtual threads, simulated blocking I/O, retries, and workflow scheduling. No short smoke
+number or machine-specific result is presented as a project performance claim.
 
 ```bash
-./gradlew test
-./gradlew check
+./gradlew :benchmarks:jmh
 ```
 
-`check` compiles with Java 21 and strict compiler linting, runs the test suite and coverage report,
-and validates public Javadocs. CI exercises Java 21 and Java 25.
+See [`docs/BENCHMARKS.md`](docs/BENCHMARKS.md) for workloads, warmup, measurements, forks, profiling,
+hardware reporting, and interpretation rules.
 
-## Migrating from 1.x
+## Installation
 
-The default-package `BackgroundTaskScheduler` remains as a deprecated facade for source compatibility.
-New code should use `io.github.voraes.jscheduler.Scheduler`, `Job`, `Schedule`, and `JobHandle`.
+Requirements:
 
-Important changes:
+- JDK 21 or newer
+- The checked-in Gradle wrapper for source builds
 
-- Scheduling now returns a handle in the v2 API.
-- Delays and intervals use `Duration` rather than primitive/`TimeUnit` pairs.
-- Priority applies only after a job becomes due. The 1.x implementation could execute future work
-  early by polling a global priority queue from an unrelated timer callback.
-- Recurring jobs now actually recur; 1.x removed their only queue entry on the first callback.
-- Failures are available through execution results instead of being printed.
-- `shutdown()` is immediate. Use `shutdownGracefully(Duration)` when ready work should drain.
-- Virtual-thread concurrency is bounded rather than implicitly unlimited.
+The intended Maven coordinates are:
 
-## Project scope
+```text
+io.github.voraes:j-scheduler:2.0.0
+io.github.voraes:j-scheduler-spring-boot-starter:2.0.0
+```
 
-J-Scheduler is an in-process scheduler, not a distributed orchestration platform. It does not provide
-leader election, durable lambda persistence, cluster coordination, or database-backed scheduling.
+No Maven Central release is claimed yet. To consume the current snapshot locally:
+
+```bash
+./gradlew publishToMavenLocal
+```
+
+```kotlin
+implementation("io.github.voraes:j-scheduler:2.0.0-SNAPSHOT")
+```
+
+Sources, Javadocs, required POM metadata, conditional PGP signing, and a local staging repository are
+configured. External publication requires explicit maintainer authorization; see
+[`docs/RELEASING.md`](docs/RELEASING.md).
+
+## Documentation
+
+- [Benchmark methodology](docs/BENCHMARKS.md)
+- [Concurrency model and review invariants](docs/CONCURRENCY.md)
+- [Migration from 1.x](docs/MIGRATION_V2.md)
+- [Release preparation](docs/RELEASING.md)
+- [Changelog](CHANGELOG.md)
+- Generated API documentation: `./gradlew javadoc`
+
+## Contributing
+
+Run the ordinary quality gate with:
+
+```bash
+./gradlew clean check
+```
+
+Concurrency changes should also pass the opt-in bounded stress suite:
+
+```bash
+./gradlew stressTest
+```
+
+See [`CONTRIBUTING.md`](CONTRIBUTING.md) and report vulnerabilities through
+[`SECURITY.md`](SECURITY.md).
 
 ## License
 
-Licensed under the [MIT License](LICENSE).
+J-Scheduler is available under the [MIT License](LICENSE).

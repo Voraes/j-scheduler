@@ -12,7 +12,10 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 
-/** Immutable validated directed acyclic graph of jobs. */
+/**
+ * Immutable, thread-safe, validated directed acyclic graph of jobs. Each scheduled run owns its
+ * mutable orchestration state and submits nodes through the ordinary scheduler pipeline.
+ */
 public final class Workflow {
     private final String name;
     private final Map<String, Job> jobs;

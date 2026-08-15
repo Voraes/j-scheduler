@@ -1,0 +1,15 @@
+j-scheduler:
+  execution:
+    mode: virtual
+    max-concurrent-jobs: 200
+  shutdown:
+    timeout: 30s
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,metrics
+  endpoint:
+    health:
+      show-details: always

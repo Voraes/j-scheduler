@@ -1,28 +1,52 @@
-name: CI/CD j-scheduler
+name: CI
 
 on:
   push:
-    branches:
-      - master
   pull_request:
-    branches:
-      - master
+
+permissions:
+  contents: read
 
 jobs:
-  build:
+  quality:
+    name: Java ${{ matrix.java }} quality gate
     strategy:
+      fail-fast: false
       matrix:
         java: ['21', '25']
     runs-on: ubuntu-latest
+    timeout-minutes: 15
 
     steps:
       - uses: actions/checkout@v4.2.0
-      - name: Set Gradlew Permissions
-        run: chmod +x ./gradlew
       - name: Set up JDK ${{ matrix.java }}
         uses: actions/setup-java@v4.4.0
         with:
-          distribution: 'corretto'
+          distribution: 'temurin'
           java-version: ${{ matrix.java }}
-      - name: Build with Gradle
-        run: ./gradlew check
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+      - name: Build, test, static analysis, and Javadocs
+        run: ./gradlew clean check --no-daemon
+      - name: Upload test reports on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-reports-java-${{ matrix.java }}
+          path: '**/build/reports/tests/'
+
+  stress:
+    name: Concurrency stress and benchmark smoke
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4.2.0
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4.4.0
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+      - name: Run bounded stress tests and verify JMH harness
+        run: ./gradlew stressTest :benchmarks:jmhSmoke --no-daemon

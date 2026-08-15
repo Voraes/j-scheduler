@@ -1,0 +1,46 @@
+{
+  "properties": [
+    {
+      "name": "j-scheduler.execution.mode",
+      "description": "Execution strategy used by the auto-configured scheduler.",
+      "defaultValue": "platform"
+    },
+    {
+      "name": "j-scheduler.execution.platform-threads",
+      "description": "Number of bounded worker threads used in platform mode."
+    },
+    {
+      "name": "j-scheduler.execution.max-concurrent-jobs",
+      "description": "Maximum number of simultaneous jobs in virtual-thread mode.",
+      "defaultValue": 100
+    },
+    {
+      "name": "j-scheduler.shutdown.timeout",
+      "description": "Grace period for ready and running work during application shutdown.",
+      "defaultValue": "30s"
+    },
+    {
+      "name": "j-scheduler.shutdown-hook",
+      "description": "Whether to register a JVM shutdown hook in addition to Spring lifecycle management.",
+      "defaultValue": false
+    },
+    {
+      "name": "j-scheduler.metrics.enabled",
+      "type": "java.lang.Boolean",
+      "description": "Whether to bind scheduler meters when a Micrometer registry is available.",
+      "defaultValue": true
+    },
+    {
+      "name": "j-scheduler.health.enabled",
+      "type": "java.lang.Boolean",
+      "description": "Whether to contribute scheduler health when Spring Boot health support is available.",
+      "defaultValue": true
+    },
+    {
+      "name": "j-scheduler.declarative.enabled",
+      "type": "java.lang.Boolean",
+      "description": "Whether to discover and schedule bean methods annotated with @ScheduledJob.",
+      "defaultValue": true
+    }
+  ]
+}

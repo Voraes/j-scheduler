@@ -7,7 +7,10 @@ import java.util.Objects;
 import java.util.concurrent.CancellationException;
 import java.util.function.Predicate;
 
-/** Immutable retry configuration. Attempts include the initial execution. */
+/**
+ * Immutable retry configuration. The attempt limit includes the initial execution, and backoff is
+ * returned to the scheduler's timed queue rather than sleeping on a worker.
+ */
 public final class RetryPolicy {
     private static final RetryPolicy NONE = new RetryPolicy(1, Duration.ZERO, Duration.ZERO,
             0.0, Backoff.FIXED, failure -> false);

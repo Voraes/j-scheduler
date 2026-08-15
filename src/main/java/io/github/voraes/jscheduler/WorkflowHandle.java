@@ -13,11 +13,16 @@ public interface WorkflowHandle {
 
     Optional<WorkflowResult> result();
 
+    /** Completes normally with the immutable terminal workflow result. */
     CompletionStage<WorkflowResult> completion();
 
     default boolean cancel() {
         return cancel(false);
     }
 
+    /**
+     * Prevents pending nodes from starting and cancels active node handles. Interruption, when
+     * requested, remains cooperative.
+     */
     boolean cancel(boolean mayInterruptIfRunning);
 }
