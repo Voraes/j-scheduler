@@ -1,105 +1,93 @@
 
-import java.util.concurrent.Executors;
-import java.util.concurrent.PriorityBlockingQueue;
-import java.util.concurrent.ScheduledExecutorService;
+import io.github.voraes.jscheduler.Job;
+import io.github.voraes.jscheduler.JobHandle;
+import io.github.voraes.jscheduler.Schedule;
+import io.github.voraes.jscheduler.Scheduler;
+
+import java.time.Duration;
+import java.time.Instant;
+import java.util.Map;
+import java.util.Objects;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * Compatibility facade for the 1.x API. New code should use {@link Scheduler}.
+ *
+ * @deprecated use {@link Scheduler#builder()}
+ */
+@Deprecated(since = "2.0", forRemoval = false)
 public class BackgroundTaskScheduler {
-    private final ScheduledExecutorService executorService;
-    private final PriorityBlockingQueue<PriorityTask> taskQueue;
+    private final Scheduler scheduler;
+    private final Map<Runnable, Registration> registrations = new ConcurrentHashMap<>();
 
     public BackgroundTaskScheduler(int threadCount) {
-        this.executorService = Executors.newScheduledThreadPool(threadCount);
-        this.taskQueue = new PriorityBlockingQueue<>();
+        scheduler = Scheduler.builder().platformThreads(threadCount).build();
     }
 
     public void scheduleTask(Runnable task, int delay, TimeUnit timeUnit, int priority) {
-        PriorityTask priorityTask = new PriorityTask(task, priority);
-        taskQueue.add(priorityTask);
-
-        executorService.schedule(() -> {
-            try {
-                PriorityTask taskToRun = taskQueue.poll(); // Remove from the queue the task with the highest priority
-                if (taskToRun != null) {
-                    System.out.println("Executing task with priority: " + taskToRun.priority);
-                    taskToRun.run();
-                }
-            } catch (Exception e) {
-                System.err.println("Task execution failed: " + e.getMessage());
-                e.printStackTrace();
-            }
-        }, delay, timeUnit);
+        register(task, Schedule.delayed(duration(delay, timeUnit)), priority);
     }
 
     public void scheduleAtFixedRate(Runnable task, long initialDelay, long period, TimeUnit timeUnit, int priority) {
-        PriorityTask priorityTask = new PriorityTask(task, priority);
-        taskQueue.add(priorityTask);
-
-        executorService.scheduleAtFixedRate(() -> {
-            try {
-                PriorityTask taskToRun = taskQueue.poll(); // Remove from the queue the task with the highest priority
-                if (taskToRun != null) {
-                    System.out.println("Executing task with priority: " + taskToRun.priority);
-                    taskToRun.run();
-                }
-            } catch (Exception e) {
-                System.err.println("Task execution failed: " + e.getMessage());
-                e.printStackTrace();
-            }
-        }, initialDelay, period, timeUnit);
+        register(task, Schedule.fixedRate(duration(initialDelay, timeUnit), duration(period, timeUnit)), priority);
     }
 
-    // Schedules a task to run with a fixed delay between executions
     public void scheduleWithFixedDelay(Runnable task, long initialDelay, long delay, TimeUnit timeUnit, int priority) {
-        PriorityTask priorityTask = new PriorityTask(task, priority);
-        taskQueue.add(priorityTask);
-
-        executorService.scheduleWithFixedDelay(() -> {
-            try {
-                PriorityTask taskToRun = taskQueue.poll(); // Remove from the queue the task with the highest priority
-                if (taskToRun != null) {
-                    System.out.println("Executing task with priority: " + taskToRun.priority);
-                    taskToRun.run();
-                }
-            } catch (Exception e) {
-                System.err.println("Task execution failed: " + e.getMessage());
-                e.printStackTrace();
-            }
-        }, initialDelay, delay, timeUnit);
+        register(task, Schedule.fixedDelay(duration(initialDelay, timeUnit), duration(delay, timeUnit)), priority);
     }
 
-    public synchronized void adjustTaskPriority(Runnable task, int newPriority) {
-        taskQueue.removeIf(priorityTask -> priorityTask.task.equals(task));
-        taskQueue.add(new PriorityTask(task, newPriority));
+    public void adjustTaskPriority(Runnable task, int newPriority) {
+        registrations.computeIfPresent(task, (ignored, old) -> {
+            Duration remaining = old.handle.nextExecution()
+                    .map(next -> Duration.between(Instant.now(), next))
+                    .map(value -> value.isNegative() ? Duration.ZERO : value)
+                    .orElse(Duration.ZERO);
+            old.handle.cancel(false);
+            Schedule replacement = withInitialDelay(old.schedule, remaining);
+            return createRegistration(task, replacement, newPriority);
+        });
     }
 
     public void shutdown() {
-        executorService.shutdown();
+        scheduler.shutdown();
     }
 
     public void registerShutdownHook() {
-        Runtime.getRuntime().addShutdownHook(new Thread(this::shutdown));
+        scheduler.registerShutdownHook();
     }
 
-    // Task class with priority
-    private static class PriorityTask implements Runnable, Comparable<PriorityTask> {
-        private final Runnable task;
-        private final int priority;
-
-        public PriorityTask(Runnable task, int priority) {
-            this.task = task;
-            this.priority = priority;
-        }
-
-        @Override
-        public void run() {
-            task.run();
-        }
-
-        @Override
-        public int compareTo(PriorityTask other) {
-            // Higher priority tasks come first
-            return Integer.compare(other.priority, this.priority);
+    private void register(Runnable task, Schedule schedule, int priority) {
+        Objects.requireNonNull(task, "task");
+        Registration registration = createRegistration(task, schedule, priority);
+        Registration previous = registrations.put(task, registration);
+        if (previous != null) {
+            previous.handle.cancel(false);
         }
     }
+
+    private Registration createRegistration(Runnable task, Schedule schedule, int priority) {
+        Job job = Job.builder("legacy-task").task(task).priority(priority).build();
+        return new Registration(scheduler.schedule(job, schedule), schedule);
+    }
+
+    private static Schedule withInitialDelay(Schedule schedule, Duration initialDelay) {
+        if (schedule instanceof Schedule.FixedRate fixedRate) {
+            return Schedule.fixedRate(initialDelay, fixedRate.period());
+        }
+        if (schedule instanceof Schedule.FixedDelay fixedDelay) {
+            return Schedule.fixedDelay(initialDelay, fixedDelay.delay());
+        }
+        return Schedule.delayed(initialDelay);
+    }
+
+    private static Duration duration(long value, TimeUnit unit) {
+        Objects.requireNonNull(unit, "timeUnit");
+        if (value < 0) {
+            throw new IllegalArgumentException("delay must not be negative");
+        }
+        return Duration.ofNanos(unit.toNanos(value));
+    }
+
+    private record Registration(JobHandle handle, Schedule schedule) { }
 }
